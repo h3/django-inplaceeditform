@@ -1,0 +1,70 @@
+0.70
+====
+* Catalonia translations, by Raimon Esteve
+
+0.69
+====
+* Compatible with the CSRF protection (CsrfViewMiddleware)
+* Improvement in the rendering of the widgets (better calculate the height and width)
+* More versatile the api
+
+0.68
+====
+* Update the README
+
+0.67
+====
+* Spanish translations
+
+0.66
+====
+* Support to old browsers. Some browser have not a JSON library
+
+0.65
+====
+* Improved the inplace edit widget in images.
+
+0.64
+====
+* Inplace edit of imagefield and filefield works in IE (new), FF, Chrome (alpha)
+
+0.63
+====
+* Inplace edit of imagefield and filefield (alpha)
+* More versatile the api
+
+0.62
+====
+
+* Fixes the warning when the error is for other field
+* More versatile the api
+
+0.60
+====
+
+* Created a test project
+* Inplace editof booleanfield
+* Fixes some details of datetimefield and datefield
+  * Can't save datetime values on several browser
+  * The icons did not see
+* autoheight and autowidth
+* Improve the inplace edit with choices field
+* Made less intrusive inplace edit form, now it's putting two spaces)
+
+0.55
+====
+
+ * A new egg from django-inplaceedit-version1
+ * The js should be a plugin jQuery
+ * The generated html should be bit intrusive
+ * API to create adaptators
+ * Option to auto_height, and auto_width
+ * Error/ succes messages
+ * Two functions of render_value, with you can edit, and other when you cannot edit
+ * A function with empty value
+ * The files media should not be added if this is adding
+ * The inplaceedit should can edit some like this:
+
+::
+
+    {% inplace_edit "obj.field_x.field_y" %}
