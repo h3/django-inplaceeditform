@@ -120,6 +120,9 @@ class BaseAdaptorField(object):
             path_module, class_adaptor = ('.'.join(can_edit_adaptor_path.split('.')[:-1]),
                                           can_edit_adaptor_path.split('.')[-1])
             return getattr(import_module(path_module), class_adaptor).can_edit(self)
+        model_edit = '%s.change_%s' % (self.model._meta.app_label,self.model._meta.module_name)
+        if self.request.user.has_perm(model_edit):
+            return True
         return self.request.user.is_authenticated and self.request.user.is_superuser
 
     def loads_to_post(self, request):
