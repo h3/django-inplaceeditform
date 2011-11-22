@@ -1,0 +1,450 @@
+Metadata-Version: 1.0
+Name: django-inplaceedit
+Version: 0.74
+Summary: Django application that allows you to inline edition of some data from the database
+Home-page: https://tracpub.yaco.es/djangoapps/wiki/InplaceEditForm
+Author: Yaco Sistemas S.L.
+Author-email: pmartin@yaco.es
+License: LGPL 3
+Description: .. contents::
+        
+        =================
+        Inplace Edit Form
+        =================
+        
+        Information
+        ===========
+        
+        Inplace Edit Form is a Django application that allows you to inline edition of some data from the database
+        
+        It is distributed under the terms of the GNU Lesser General Public
+        License <http://www.gnu.org/licenses/lgpl.html>
+        
+        Requeriments
+        ============
+        
+        * `jQuery <http://jquery.com/>`_
+        
+        Installation
+        ============
+        
+        Install in your base.html
+        -------------------------
+        
+        ::
+        
+        {% load inplace_edit %}
+        {% inplace_media %}
+        
+        In your settings.py
+        -------------------
+        
+        ::
+        
+        INSTALLED_APPS = (
+        'django.contrib.auth',
+        'django.contrib.contenttypes',
+        'django.contrib.sessions',
+        'django.contrib.sites',
+        'django.contrib.admin',
+        
+        #.....................#
+        
+        'inplaceeditform',
+        )
+        
+        
+        And uncomment the request context processor:
+        
+        ::
+        
+        TEMPLATE_CONTEXT_PROCESSORS = (
+        #...#
+        'django.core.context_processors.request',
+        #...#
+        )
+        
+        
+        In your urls.py
+        ---------------
+        
+        ::
+        
+        urlpatterns = patterns('',
+        
+        #...#
+        
+        (r'^inplaceeditform/', include('inplaceeditform.urls')),
+        
+        #...#
+        )
+        
+        If you use the date adaptor or datetime adaptor also:
+        
+        ::
+        
+        js_info_dict = {
+        'packages': ('django.conf',),
+        }
+        
+        urlpatterns = patterns('',
+        
+        #...#
+        
+        (r'^inplaceeditform/', include('inplaceeditform.urls')),
+        (r'^jsi18n$', 'django.views.i18n.javascript_catalog', js_info_dict),
+        )
+        
+        
+        Media files
+        -----------
+        
+        Link the media files in your project media directory
+        
+        ::
+        
+        cd {{ MEDIA_ROOT }}
+        ln -s {{ INPLACE_EDIT_FORM_PATH }}media/ inplaceeditform
+        
+        Basic usage
+        ===========
+        
+        ::
+        
+        {% inplace_edit  "OBJ.FIELD_NAME" %}
+        {% inplace_edit  "OBJ.FIELD_NAME|FILTER1|FILTER2|...|FILTERN" %}
+        
+        Examples
+        --------
+        
+        ::
+        
+        {% load inplace_edit %}
+        <html>
+        <head>
+        ...
+        <script src="{{ MEDIA_URL }}js/jquery.min.js" type="text/javascript"></script>
+        {% inplace_media %}
+        </head>
+        <body>
+        ...
+        <div id="content">
+        ...
+        {% inplace_edit "content.name" %}
+        ...
+        <div class="description">
+        {% inplace_edit "content.date_initial|date:'d m Y'" %}
+        {% inplace_edit "content.description|safe" %}
+        </div>
+        <div class="body">
+        {% inplace_edit "content.body|safe|truncatewords_html:15" %}
+        </div>
+        </div>
+        ...
+        </body>
+        </html>
+        
+        How to use it
+        -------------
+        
+        Just pass the cursor above the field and double click, authenticated with a super user
+        
+        Advanced usage
+        ==============
+        
+        Inplaceedit has some optionals parameters that the templatetag can receive to change its behavior:
+        * auto_height: Adapt the height's widget to the tag container.
+        * auto_width: Adapt the width's widget to the tag container.
+        * class_inplace: Add a class to edit inline form.
+        * tag_name_cover: The value is covered for a span. But it's possible to change it.
+        * filters_to_show: The server filters the value before to save. List separate for "|"
+        * loads: If you use some filter that need a load, you set this option. List separate for ":"
+        
+        Examples
+        --------
+        
+        ::
+        
+        {% inplace_edit "content.description|safe" auto_height=1, auto_width=1 %}
+        {% inplace_edit "content.title" class_inplace="titleFormEditInline" %}
+        {% inplace_edit "content.description|safe" filters_to_show="safe|truncatewords_html:30", tag_name_cover="div" %}
+        {% inplace_edit "content.description|my_filter" loads="my_template_tag" %}
+        
+        
+        Adaptor API
+        ===========
+        
+        You can create a adaptor to work with inplace edit form, the behavior is fully customizable. To default inplaceedit has 8 adaptors. These use the api, overwriting some methods for them.
+        
+        First step
+        ----------
+        
+        In your settings:
+        
+        ::
+        
+        ADAPTOR_INPLACEEDIT = {'myadaptor': 'app_name.fields.MyAdaptor'}
+        
+        In app_name.fields.MyAdaptor:
+        
+        ::
+        
+        class MyAdaptor(BaseAdaptorField):
+        
+        @property
+        def name(self):
+        return 'myadaptor'
+        
+        Python API
+        ----------
+        
+        * loads_to_post: It returns the value of the request (normally request.POST)
+        * classes: Classes of tag cover. By default "inplaceedit" and "myadaptorinplaceedit"
+        * get_config: Preprocessed of the configuration. By default, it does nothing.
+        * get_form_class: It returns the form class.
+        * get_form: It returns a instace of form class.
+        * get_field: It returns a field of instance of form class.
+        * render_value: It returns the render of the value. If you write {% inplace_edit "obj.name|filter1" %} it returns something like this {{ obj.name|filter1 }}.
+        * render_value_edit: It returns the render value if you can edit. It returns by default the same of "render_value", but if the value is None call to empty_value
+        * empty_value: It returns an empty value for this adaptor. By default, 'Dobleclick to edit'.
+        * render_field: It returns the render of form, with a field.
+        * render_media_field: It returns the media (scripts and css) of the field.
+        * render_config: It returns the render of config.
+        * can_edit: It returns a boolean that indicate if this user can edit inline this content or not.
+        * get_value_editor: It returns a clean value to be saved in DB.
+        * save: Save the value in DB.
+        * get_auto_height: Returned if the field rendered with auto height
+        * get_auto_width: Returned if the field rendered with auto width
+        * treatment_height: Special treatment to widget's height.
+        * treatment_width: Special treatment to widget's width.
+        
+        ::
+        
+        If you want to use own options in your adaptor, you can do it. These options will be in self.config in the adaptor.
+        {% inplace_edit "obj.field_name" my_opt1="value1", my_opt2="value2" %}
+        
+        JavaScript API
+        --------------
+        
+        Exist there hooks,
+        
+        * getValue: if the value is componing for various widgets, you can set the function getValue, to these DOM elements. Something like this:
+        
+        ::
+        
+        <script type="text/javascript">
+        (function($){
+        $(document).ready(function () {
+        function myGetValue(form, field_id) {
+        return ""Something""
+        }
+        $(".applyMyAdaptor").data("getValue", myGetValue);
+        });
+        })(jQuery);
+        </script>
+        
+        * applyFinish: if you need/want to do some action after the value be saved. Something like this:
+        
+        ::
+        
+        <script type="text/javascript">
+        (function($){
+        $(document).ready(function () {
+        function myApplyFinish() {
+        return ""Something""
+        }
+        $(".applyMyAdaptor").data("applyFinish", myApplyFinish);
+        });
+        })(jQuery);
+        </script>
+        
+        * cancelFinish: if you need/want to do some action after the cancel the edit. Something like this:
+        
+        ::
+        
+        <script type="text/javascript">
+        (function($){
+        $(document).ready(function () {
+        function myCancelFinish() {
+        return ""Something""
+        }
+        $(".applyMyAdaptor").data("cancelFinish", myCancelFinish);
+        });
+        })(jQuery);
+        </script>
+        
+        For example the adaptor datetime use these hooks.
+        
+        Overwriting a default adaptor
+        -----------------------------
+        
+        To overwrite a adaptor add in your settings something like this:
+        
+        ::
+        
+        ADAPTOR_INPLACEEDIT = {'text': 'app_name.fields.MyAdaptorText'}
+        
+        For this case you overwrite the AdaptorText with MyAdaptorText.
+        
+        Permission Adaptor API
+        ======================
+        
+        By default you can inline edit a field if you are authenticated with a superuser. But it's customizable:
+        
+        
+        Overwriting the default permission adaptor
+        -------------------------------------------
+        
+        To overwrite the permission adaptor add in your settings something like this:
+        
+        ::
+        
+        ADAPTOR_INPLACEEDIT_EDIT = 'app_name.fields.MyAdaptorEditInline'
+        
+        
+        MyAdaptorEditInline is a class with a single class method, this method receives a adaptor field
+        
+        ::
+        
+        class MyAdaptorEditInline(object):
+        
+        @classmethod
+        def can_edit(cls, adaptor_field):
+        return True # All user can edit
+        
+        Example
+        -------
+        
+        ::
+        
+        class MyAdaptorEditInline(object):
+        
+        @classmethod
+        def can_edit(cls, adaptor_field):
+        user = adaptor_field.request.user
+        obj = adaptor_field.obj
+        can_edit = False
+        if user.is_anonymous():
+        pass
+        elif user.is_superuser:
+        can_edit = True
+        else:
+        can_edit = has_permission(obj, user, 'edit')
+        return can_edit
+        
+        
+        Testing
+        =======
+        
+        This django application has been tested on severals browsers: Firefox, Google Chrome, Opera, Safari and Internet Explorer on versions 7 and 8, to ckeck javascript actions.
+        
+        Also, exists a django project to test inplaceeditform. This project can use as demo project, because inplaceeditform is totally adapted to it.
+        
+        Transmeta
+        =========
+        
+        This egg is compatible with  `Transmeta <http://pypi.python.org/pypi/django-transmeta>`_  But it is not a requirement
+        
+        Development
+        ===========
+        
+        You can get the last bleeding edge version of inplaceedit by doing a checkout
+        of its subversion repository::
+        
+        svn co http://svnpub.yaco.es/djangoapps/inplaceeditform/trunk/
+        
+        
+        
+        0.74 (2011-10-03)
+        =================
+        * Usability: edit inline works when you submit the form
+        
+        0.73 (2011-09-22)
+        =================
+        * Image/File field compatibility with Django 1.1 (overwriting inplaceeditform/adaptor_file/inc.csrf_token.html) (Django 1.2 or above recommended)
+        
+        0.72 (2011-09-16)
+        =================
+        * Compatibility with jQuery 1.2 (jQuery 1.5 or above recommended)
+        * Compatibility with Django 1.1 (Django 1.2 or above recommended)
+        
+        0.71 (2011-09-5)
+        ================
+        * Fixed error in 0.69 rendering text fields whose font size is not integer.
+        
+        0.70 (2011-08-31)
+        =================
+        * Catalonia translations, by Raimon Esteve
+        
+        0.69 (2011-08-18)
+        =================
+        * Compatible with the CSRF protection (CsrfViewMiddleware)
+        * Improvement in the rendering of the widgets (better calculate the height and width)
+        * More versatile the api
+        
+        0.68 (2011-08-16)
+        =================
+        * Update the README
+        
+        0.67 (2011-06-23)
+        =================
+        * Spanish translations
+        
+        0.66 (2011-06-21)
+        =================
+        * Support to old browsers. Some browser have not a JSON library
+        
+        0.65 (2011-06-7)
+        ================
+        * Improved the inplace edit widget in images.
+        
+        0.64 (2011-06-6)
+        ================
+        * Inplace edit of imagefield and filefield works in IE (new), FF, Chrome (alpha)
+        
+        0.63 (2011-05-24)
+        =================
+        * Inplace edit of imagefield and filefield (alpha)
+        * More versatile the api
+        
+        0.62 (2011-03-18)
+        =================
+        
+        * Fixes the warning when the error is for other field
+        * More versatile the api
+        
+        0.60  (2011-02-18)
+        ==================
+        
+        * Created a test project
+        * Inplace editof booleanfield
+        * Fixes some details of datetimefield and datefield
+        * Can't save datetime values on several browser
+        * The icons did not see
+        * autoheight and autowidth
+        * Improve the inplace edit with choices field
+        * Made less intrusive inplace edit form, now it's putting two spaces)
+        
+        0.55  (2011-02-11)
+        ==================
+        
+        * A new egg from django-inplaceedit-version1
+        * The js should be a plugin jQuery
+        * The generated html should be bit intrusive
+        * API to create adaptators
+        * Option to auto_height, and auto_width
+        * Error/ succes messages
+        * Two functions of render_value, with you can edit, and other when you cannot edit
+        * A function with empty value
+        * The files media should not be added if this is adding
+        * The inplaceedit should can edit some like this:
+        
+        ::
+        
+        {% inplace_edit "obj.field_x.field_y" %}
+        
+Keywords: django inplace inline edit inline form
+Platform: UNKNOWN
+Classifier: Development Status :: 4 - Beta
+Classifier: Framework :: Django
+Classifier: License :: OSI Approved :: GNU Library or Lesser General Public License (LGPL)

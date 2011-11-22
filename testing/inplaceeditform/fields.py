@@ -4,9 +4,10 @@ from django.contrib.admin.widgets import AdminSplitDateTime, AdminDateWidget
 from django.forms.models import modelform_factory
 from django.template.loader import render_to_string
 from django.utils import simplejson
-from django.utils.importlib import import_module
+
 from django.utils.translation import ugettext
 
+from inplaceeditform.commons import  import_module
 from inplaceeditform.commons import has_transmeta, apply_filters
 
 
@@ -36,6 +37,11 @@ class BaseAdaptorField(object):
 
         self.class_inplace = self.config.get('class_inplace', '')
         self.tag_name_cover = self.config.get('tag_name_cover', 'span')
+        font_size = self.config.get('font_size', '12')
+        if font_size.endswith('px'):
+            self.font_size = float(font_size.replace('px', ''))
+        else:
+            self.font_size = 12
         loads = self.config.get('loads', None)
         self.loads = loads and loads.split(':') or []
         self.initial = {}
@@ -86,17 +92,23 @@ class BaseAdaptorField(object):
     def empty_value(self):
         return ugettext('Dobleclick to edit')
 
-    def render_field(self, template_name="inplaceeditform/render_field.html"):
-        return render_to_string(template_name,
-                                {'form': self.get_form(),
-                                 'field': self.get_field(),
-                                 'class_inplace': self.class_inplace})
+    def render_field(self, template_name="inplaceeditform/render_field.html", extra_context=None):
+        extra_context = extra_context or {}
+        context = {'form': self.get_form(),
+                   'field': self.get_field(),
+                   'MEDIA_URL': settings.MEDIA_URL,
+                   'class_inplace': self.class_inplace}
+        context.update(extra_context)
+        return render_to_string(template_name, context)
 
-    def render_media_field(self, template_name="inplaceeditform/render_media_field.html"):
-        return render_to_string(template_name,
-                                {'field': self.get_field(),
-                                 'MEDIA_URL': settings.MEDIA_URL,
-                                 'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX})
+    def render_media_field(self, template_name="inplaceeditform/render_media_field.html", extra_context=None):
+        extra_context = extra_context or {}
+        context = {'field': self.get_field(),
+                   'MEDIA_URL': settings.MEDIA_URL,
+                   'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX}
+        context.update(extra_context)
+
+        return render_to_string(template_name, context)
 
     def render_config(self, template_name="inplaceeditform/render_config.html"):
         return render_to_string(template_name,
@@ -117,24 +129,36 @@ class BaseAdaptorField(object):
         setattr(self.obj, self.field_name, value)
         self.obj.save()
 
-    def treatment_height(self, height):
-        return height
+    def get_auto_height(self):
+        return self.config.get('auto_height', False)
 
-    def treatment_width(self, width):
-        return width
+    def get_auto_width(self):
+        return self.config.get('auto_width', False)
+
+    def treatment_height(self, height, width=None):
+        return "%spx" % height
+
+    def treatment_width(self, width, height=None):
+        return "%spx" % width
 
     def _adding_size(self, field):
         attrs = field.field.widget.attrs
         widget_options = self.config and self.config.get('widget_options', {})
-        auto_height = self.config.get('auto_height', False)
-        auto_width = self.config.get('auto_width', False)
+        auto_height = self.get_auto_height()
+        auto_width = self.get_auto_width()
         if not 'style' in attrs:
             style = ''
+            height = int(widget_options.get('height', '0').replace('px', ''))
+            width = int(widget_options.get('width', '0').replace('px', ''))
+            if height and not auto_height:
+                style += "height: %s; " % self.treatment_height(height, width)
+            if width and not auto_width:
+                style += "width: %s; " % self.treatment_width(width, height)
+            if not auto_height or not auto_width:
+                style += "font-size: %spx; " % self.font_size
             for key, value in widget_options.items():
-                if key == 'height' and not auto_height:
-                    value = self.treatment_height(value)
-                elif key == 'width' and not auto_width:
-                    value = self.treatment_width(value)
+                if key in ('height', 'width'):
+                    continue
                 style += "%s: %s; " % (key, value)
             attrs['style'] = style
         field.field.widget.attrs = attrs
@@ -162,16 +186,18 @@ class BaseAdaptorField(object):
 
 class AdaptorTextField(BaseAdaptorField):
 
+    INCREASE_HEIGHT = 3
+    MULTIPLIER_WIDTH = 1.25
+
     @property
     def name(self):
         return 'text'
 
-    def treatment_width(self, width):
-        if width:
-            width = float(width.replace('px', ''))
-            width = width + width / 4
-            return '%spx' % width
-        return width
+    def treatment_height(self, height, width=None):
+        return "%spx" % (self.font_size + self.INCREASE_HEIGHT)
+
+    def treatment_width(self, width, height=None):
+        return "%spx" % (width * self.MULTIPLIER_WIDTH)
 
 
 class AdaptorTextAreaField(BaseAdaptorField):
@@ -255,15 +281,18 @@ class AdaptorDateTimeField(BaseDateField):
 
 class AdaptorChoicesField(BaseAdaptorField):
 
+    MULTIPLIER_HEIGHT = 1.75
+    INCREASE_WIDTH = 40
+
     @property
     def name(self):
         return 'choices'
 
-    def treatment_height(self, height):
-        return '30px'
+    def treatment_height(self, height, width=None):
+        return "%spx" % (self.font_size * self.MULTIPLIER_HEIGHT)
 
-    def treatment_width(self, width):
-        return '100px'
+    def treatment_width(self, width, height=None):
+        return "%spx" % (width + self.INCREASE_WIDTH)
 
     def render_value(self, field_name=None):
         field_name = field_name or self.field_name
@@ -272,15 +301,18 @@ class AdaptorChoicesField(BaseAdaptorField):
 
 class AdaptorForeingKeyField(BaseAdaptorField):
 
+    MULTIPLIER_HEIGHT = 1.75
+    INCREASE_WIDTH = 40
+
     @property
     def name(self):
         return 'fk'
 
-    def treatment_height(self, height):
-        return '30px'
+    def treatment_height(self, height, width=None):
+        return "%spx" % int(self.font_size * self.MULTIPLIER_HEIGHT)
 
-    def treatment_width(self, width):
-        return '100px'
+    def treatment_width(self, width, height=None):
+        return "%spx" % (width + self.INCREASE_WIDTH)
 
     def render_value(self, field_name=None):
         value = super(AdaptorForeingKeyField, self).render_value(field_name)
@@ -298,15 +330,18 @@ class AdaptorForeingKeyField(BaseAdaptorField):
 
 class AdaptorManyToManyField(BaseAdaptorField):
 
+    MULTIPLIER_HEIGHT = 6
+    INCREASE_WIDTH = 50
+
     @property
     def name(self):
         return 'm2m'
 
-    def treatment_height(self, height):
-        return '100px'
+    def treatment_height(self, height, width=None):
+        return "%spx" % (self.font_size * self.MULTIPLIER_HEIGHT)
 
-    def treatment_width(self, width):
-        return '100px'
+    def treatment_width(self, width, height=None):
+        return "%spx" % (width + self.INCREASE_WIDTH)
 
     def get_value_editor(self, value):
         return [item.pk for item in super(AdaptorManyToManyField, self).get_value_editor(value)]
@@ -328,15 +363,26 @@ class AdaptorCommaSeparatedManyToManyField(AdaptorManyToManyField):
 
 class AdaptorFileField(BaseAdaptorField):
 
+    MULTIPLIER_HEIGHT = 2
+
+    def __init__(self, *args, **kwargs):
+        super(AdaptorFileField, self).__init__(*args, **kwargs)
+        self.config['send_csrfToken'] = 1
+
     def loads_to_post(self, request):
         files = request.FILES.values()
         return files and files[0] or None
 
-    def treatment_height(self, height):
-        return '25px'
+    def treatment_height(self, height, width=None):
+        return "%spx" % (self.font_size * self.MULTIPLIER_HEIGHT)
 
     def render_field(self, template_name="inplaceeditform/adaptor_file/render_field.html"):
-        return super(AdaptorFileField, self).render_field(template_name)
+        try:
+            from django.core.context_processors import csrf
+            extra_context = csrf(self.request)
+        except ImportError:
+            extra_context = {}
+        return super(AdaptorFileField, self).render_field(template_name, extra_context)
 
     def render_media_field(self, template_name="inplaceeditform/adaptor_file/render_media_field.html"):
         return super(AdaptorFileField, self).render_media_field(template_name)
@@ -352,14 +398,17 @@ class AdaptorFileField(BaseAdaptorField):
         config.update(context)
         return render_to_string(template_name, config)
 
+    def save(self, value):
+        getattr(self.obj, self.field_name).save(value.name, value)
+
 
 class AdaptorImageField(AdaptorFileField):
 
     def render_field(self, template_name="inplaceeditform/adaptor_image/render_field.html"):
-        return super(AdaptorFileField, self).render_field(template_name)
+        return super(AdaptorImageField, self).render_field(template_name)
 
     def render_media_field(self, template_name="inplaceeditform/adaptor_image/render_media_field.html"):
-        return super(AdaptorFileField, self).render_media_field(template_name)
+        return super(AdaptorImageField, self).render_media_field(template_name)
 
     def render_value(self, field_name=None, template_name='inplaceeditform/adaptor_image/render_value.html'):
         return super(AdaptorImageField, self).render_value(field_name=field_name, template_name=template_name)

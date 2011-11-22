@@ -2,12 +2,12 @@ from copy import deepcopy
 from django.conf import settings
 from django.contrib.admin.widgets import AdminSplitDateTime, AdminDateWidget
 from django.forms.models import modelform_factory
-from django.forms.widgets import FileInput
 from django.template.loader import render_to_string
 from django.utils import simplejson
-from django.utils.importlib import import_module
+
 from django.utils.translation import ugettext
 
+from inplaceeditform.commons import  import_module
 from inplaceeditform.commons import has_transmeta, apply_filters
 
 
@@ -39,7 +39,7 @@ class BaseAdaptorField(object):
         self.tag_name_cover = self.config.get('tag_name_cover', 'span')
         font_size = self.config.get('font_size', '12')
         if font_size.endswith('px'):
-            self.font_size = int(font_size.replace('px', ''))
+            self.font_size = float(font_size.replace('px', ''))
         else:
             self.font_size = 12
         loads = self.config.get('loads', None)
@@ -120,9 +120,6 @@ class BaseAdaptorField(object):
             path_module, class_adaptor = ('.'.join(can_edit_adaptor_path.split('.')[:-1]),
                                           can_edit_adaptor_path.split('.')[-1])
             return getattr(import_module(path_module), class_adaptor).can_edit(self)
-        model_edit = '%s.change_%s' % (self.model._meta.app_label,self.model._meta.module_name)
-        if self.request.user.has_perm(model_edit):
-            return True
         return self.request.user.is_authenticated and self.request.user.is_superuser
 
     def loads_to_post(self, request):
@@ -284,7 +281,7 @@ class AdaptorDateTimeField(BaseDateField):
 
 class AdaptorChoicesField(BaseAdaptorField):
 
-    MULTIPLIER_HEIGHT = 1.5
+    MULTIPLIER_HEIGHT = 1.75
     INCREASE_WIDTH = 40
 
     @property
@@ -292,7 +289,7 @@ class AdaptorChoicesField(BaseAdaptorField):
         return 'choices'
 
     def treatment_height(self, height, width=None):
-        return "%spx" % int(self.font_size * self.MULTIPLIER_HEIGHT)
+        return "%spx" % (self.font_size * self.MULTIPLIER_HEIGHT)
 
     def treatment_width(self, width, height=None):
         return "%spx" % (width + self.INCREASE_WIDTH)
@@ -304,7 +301,7 @@ class AdaptorChoicesField(BaseAdaptorField):
 
 class AdaptorForeingKeyField(BaseAdaptorField):
 
-    MULTIPLIER_HEIGHT = 1.5
+    MULTIPLIER_HEIGHT = 1.75
     INCREASE_WIDTH = 40
 
     @property
@@ -380,8 +377,11 @@ class AdaptorFileField(BaseAdaptorField):
         return "%spx" % (self.font_size * self.MULTIPLIER_HEIGHT)
 
     def render_field(self, template_name="inplaceeditform/adaptor_file/render_field.html"):
-        from django.core.context_processors import csrf
-        extra_context = csrf(self.request)
+        try:
+            from django.core.context_processors import csrf
+            extra_context = csrf(self.request)
+        except ImportError:
+            extra_context = {}
         return super(AdaptorFileField, self).render_field(template_name, extra_context)
 
     def render_media_field(self, template_name="inplaceeditform/adaptor_file/render_media_field.html"):
@@ -398,13 +398,11 @@ class AdaptorFileField(BaseAdaptorField):
         config.update(context)
         return render_to_string(template_name, config)
 
+    def save(self, value):
+        getattr(self.obj, self.field_name).save(value.name, value)
+
 
 class AdaptorImageField(AdaptorFileField):
-
-    def get_field(self):
-        field = super(AdaptorImageField, self).get_field()
-        field.field.widget = FileInput()
-        return field
 
     def render_field(self, template_name="inplaceeditform/adaptor_image/render_field.html"):
         return super(AdaptorImageField, self).render_field(template_name)

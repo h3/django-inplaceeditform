@@ -13,14 +13,14 @@
                 return false;
             });
 
-            $(this).mouseenter(function() {
+            $(this).bind("mouseenter", function() {
                 if(!enabled) {
                     return false;
                 }
                 $(this).addClass("edit_over");
             });
 
-            $(this).mouseleave(function() {
+            $(this).bind("mouseleave", function() {
                 $(this).removeClass("edit_over");
             });
 
@@ -69,9 +69,22 @@
                                 link.removeAttr("href");
                             });
                         }
-                        _this.next().find(".cancel").click(inplaceCancel);
-                        _this.next().find(".apply").click(inplaceApply);
-                        _this.next().find(".applyFile").click(inplaceApplyUpload);
+                        var applyButton = _this.next().find(".apply");
+                        var cancelButton = _this.next().find(".cancel");
+                        var applyFileButton = _this.next().find(".applyFile");
+                        if (cancelButton) {
+                            cancelButton.click(inplaceCancel);
+                        }
+                        if (applyButton) {
+                            applyButton.click(inplaceApply);
+                            _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyButton));
+                        }
+                        if (applyFileButton) {
+                            applyFileButton.click(inplaceApplyUpload);
+                            _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyFileButton));
+                        }
+
+
                     }
                 }});
             });
@@ -108,7 +121,11 @@
                         response = replaceAll(response, "'\\\\\"", "'");
                         response = replaceAll(response, "\"'", "'"); 
                     }
-                    response = JSON.parse(response);
+                    try {
+                        response = JSON.parse(response);
+                    } catch(errno) {
+                        response = eval("( " + response + " )");
+                    }
                 }
                 revertlinkInplaceEdit($(this.form).parents("a.linkInplaceEdit"));
                 var _this = this.context;
@@ -219,6 +236,10 @@
                     data = data + key + "=" + value;
                     dataToRequest += data;
                 });
+                var fontSize = inplaceedit_conf.parent().css("font-size");
+                if(fontSize!=null) {
+                    dataToRequest += "&font_size=" + fontSize;
+                }
                 return dataToRequest;
             }
 
@@ -231,6 +252,10 @@
                     var value = setting.html();
                     dataToRequest[key] = value;
                 });
+                var fontSize = inplaceedit_conf.parent().css("font-size");
+                if(fontSize!=null) {
+                    dataToRequest["font_size"] = fontSize;
+                }
                 return dataToRequest;
             }
 
@@ -262,6 +287,45 @@
                     node.text = text;
                 }
             } 
+
+            // https://docs.djangoproject.com/en/1.3/ref/contrib/csrf/#ajax
+            $(document).ajaxSend(function(event, xhr, settings) {
+                function getCookie(name) {
+                    var cookieValue = null;
+                    if (document.cookie && document.cookie != '') {
+                        var cookies = document.cookie.split(';');
+                        for (var i = 0; i < cookies.length; i++) {
+                            var cookie = jQuery.trim(cookies[i]);
+                            // Does this cookie string begin with the name we want?
+                            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                                break;
+                            }
+                        }
+                    }
+                    return cookieValue;
+                }
+                function sameOrigin(url) {
+                    // url could be relative or scheme relative or absolute
+                    var host = document.location.host; // host + port
+                    var protocol = document.location.protocol;
+                    var sr_origin = '//' + host;
+                    var origin = protocol + sr_origin;
+                    // Allow absolute or scheme relative URLs to same origin
+                    return (url == origin || url.slice(0, origin.length + 1) == origin + '/') ||
+                        (url == sr_origin || url.slice(0, sr_origin.length + 1) == sr_origin + '/') ||
+                        // or any other URL that isn't scheme relative or absolute i.e relative.
+                        !(/^(\/\/|http:|https:).*/.test(url));
+                }
+                function safeMethod(settings) {
+                    return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(settings.type)) || settings.url.indexOf("send_csrfToken") > -1;
+                }
+                if (!safeMethod(settings) && sameOrigin(settings.url)) {
+                    xhr.setRequestHeader("X-CSRFToken", getCookie('csrftoken'));
+                }
+            });
+
+
     });
     return {
         enable: function () {
