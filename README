@@ -12,6 +12,16 @@ Inplace Edit Form is a Django application that allows you to inline edition of s
 It is distributed under the terms of the GNU Lesser General Public
 License <http://www.gnu.org/licenses/lgpl.html>
 
+Demo
+====
+
+Video Demo, of django-inplaceedit and `Django-inlinetrans <http://pypi.python.org/pypi/django-inlinetrans>`_ (Set full screen mode to view it correctly)
+
+
+.. image:: http://svnpub.yaco.es/djangoapps/inplaceeditform/trunk/video-frame.png
+   :target: http://www.youtube.com/watch?v=_EjisXtMy_Y
+
+
 Requeriments
 ============
 
@@ -55,6 +65,14 @@ And uncomment the request context processor:
         'django.core.context_processors.request',
         #...#
     )
+
+
+Optional:
+
+::
+
+    INPLACEEDIT_EDIT_EMPTY_VALUE = 'Doble click to edit'
+    INPLACEEDIT_EDIT_MESSAGE_TRANSLATION = 'Write a translation'
 
 
 In your urls.py
@@ -287,22 +305,34 @@ By default you can inline edit a field if you are authenticated with a superuser
 Overwriting the default permission adaptor
 -------------------------------------------
 
-To overwrite the permission adaptor add in your settings something like this:
- 
+This package have two inplementations:
+
+ * SuperUserPermEditInline (by default): Only you can edit if you are super user
+ * AdminDjangoPermEditInline: Yo can edit the content if you have a permission edit for that model. If you want enabled this, write in your settings:
+
+ ::
+
+   ADAPTOR_INPLACEEDIT_EDIT = 'inplace_edit.perms.AdminDjangoPermEditInline'
+
+
+
+You can create a specify adaptor. MyAdaptorEditInline is a class with a single class method, this method receives a adaptor field
+
 ::
 
- ADAPTOR_INPLACEEDIT_EDIT = 'app_name.fields.MyAdaptorEditInline'
+ # in your settings
+
+ ADAPTOR_INPLACEEDIT_EDIT = 'app_name.perms.MyAdaptorEditInline'
 
 
-MyAdaptorEditInline is a class with a single class method, this method receives a adaptor field
-
-::
+ # in app_name.perms
 
  class MyAdaptorEditInline(object):
 
      @classmethod
      def can_edit(cls, adaptor_field):
         return True # All user can edit
+
 
 Example
 -------
@@ -337,11 +367,15 @@ Transmeta
 
 This egg is compatible with  `Transmeta <http://pypi.python.org/pypi/django-transmeta>`_  But it is not a requirement
 
+Django Inplace Edit Extra Field
+===============================
+
+If you want to get more download `Django Inplace Edit Extra Field <http://pypi.python.org/pypi/django-inplaceedit-extra-fields>`_ 
+
 Development
 ===========
 
-You can get the last bleeding edge version of inplaceedit by doing a checkout
+You can get the last leading edge version of inplaceedit by doing a checkout
 of its subversion repository::
 
   svn co http://svnpub.yaco.es/djangoapps/inplaceeditform/trunk/
-

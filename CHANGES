@@ -1,3 +1,33 @@
+0.81 (2012-01-25)
+=================
+* A little error in AdminDjangoPermEditInline
+
+0.80 (2012-01-24)
+=================
+* More robust when a user can edit a content
+* SuperUserPermEditInline, before was a logic, and you can not inherit.
+* AdminDjangoPermEditInline, a logic very useful. Thanks to `Raimon <https://github.com/zikzakmedia/django-inplaceeditform/commit/b6c5427563e77b23494312a7f50c66ba362709b8/>`_
+
+0.79 (2012-01-11)
+=================
+* Messages configurables and translatables in the settings
+
+0.78 (2012-01-9)
+=================
+* Messages configurables in the settings
+
+0.77 (2011-12-14)
+=================
+* Fixes a error in bolean adaptor
+
+0.76 (2011-12-08)
+=================
+* More robust
+
+0.75 (2011-11-24)
+=================
+* The resources dont't have dependencie of MEDIA_URL (in CSS file)
+
 0.74 (2011-10-03)
 =================
 * Usability: edit inline works when you submit the form

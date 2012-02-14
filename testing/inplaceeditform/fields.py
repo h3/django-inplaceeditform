@@ -9,6 +9,7 @@ from django.utils.translation import ugettext
 
 from inplaceeditform.commons import  import_module
 from inplaceeditform.commons import has_transmeta, apply_filters
+from inplaceeditform.perms import SuperUserPermEditInline
 
 
 class BaseAdaptorField(object):
@@ -90,7 +91,8 @@ class BaseAdaptorField(object):
         return self.empty_value()
 
     def empty_value(self):
-        return ugettext('Dobleclick to edit')
+        return ugettext(getattr(settings, 'INPLACEEDIT_EDIT_EMPTY_VALUE',
+                                          'Dobleclick to edit'))
 
     def render_field(self, template_name="inplaceeditform/render_field.html", extra_context=None):
         extra_context = extra_context or {}
@@ -119,8 +121,10 @@ class BaseAdaptorField(object):
         if can_edit_adaptor_path:
             path_module, class_adaptor = ('.'.join(can_edit_adaptor_path.split('.')[:-1]),
                                           can_edit_adaptor_path.split('.')[-1])
-            return getattr(import_module(path_module), class_adaptor).can_edit(self)
-        return self.request.user.is_authenticated and self.request.user.is_superuser
+            cls_perm = getattr(import_module(path_module), class_adaptor)
+        else:
+            cls_perm = SuperUserPermEditInline
+        return cls_perm.can_edit(self)
 
     def loads_to_post(self, request):
         return simplejson.loads(request.POST.get('value'))
@@ -172,7 +176,9 @@ class BaseAdaptorField(object):
                 self.field_name = transmeta.get_real_fieldname(self.field_name)
                 self.transmeta = True
                 if not self.render_value(self.field_name):
-                    self.initial = {self.field_name: ugettext('Write a traslation')}
+                    message_translation = ugettext(getattr(settings, 'INPLACEEDIT_EDIT_MESSAGE_TRANSLATION',
+                                                           'Write a traslation'))
+                    self.initial = {self.field_name: message_translation}
                 return
         self.transmeta = False
 

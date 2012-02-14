@@ -2,6 +2,7 @@ AUTHORS
 CHANGES
 README
 setup.py
+video-frame.png
 django_inplaceedit.egg-info/PKG-INFO
 django_inplaceedit.egg-info/SOURCES.txt
 django_inplaceedit.egg-info/dependency_links.txt
@@ -11,7 +12,7 @@ inplaceeditform/__init__.py
 inplaceeditform/adaptors.py
 inplaceeditform/commons.py
 inplaceeditform/fields.py
-inplaceeditform/install.txt
+inplaceeditform/perms.py
 inplaceeditform/tag_utils.py
 inplaceeditform/urls.py
 inplaceeditform/views.py
@@ -67,6 +68,7 @@ testing/inplaceeditform/adaptors.py
 testing/inplaceeditform/commons.py
 testing/inplaceeditform/fields.py
 testing/inplaceeditform/install.txt
+testing/inplaceeditform/perms.py
 testing/inplaceeditform/tag_utils.py
 testing/inplaceeditform/urls.py
 testing/inplaceeditform/views.py
