@@ -6,7 +6,7 @@
         <span class="field_id" style="display:none">{{ field.auto_id }}</span>
         {% block actions %}
             {% block apply %}
-                <button class="apply {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
+                <button {% if editable %}onclick="CKupdate()"{% endif %} class="apply {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
                     <span>
                     {% trans "Save" %}
                     </span>
@@ -21,4 +21,29 @@
             {% endblock %}
         {% endblock %}
     </form>
+
+{% if editable %}<script type="text/javascript">
+function CKupdate(){
+    /*Need this function to ajax post CKEditor*/
+    var instance = CKEDITOR.instances['{{ field.auto_id }}'];
+    instance.updateElement();
+    delete instance;
+}
+
+var CKeditor = new CKEDITOR.replace('{{ field.auto_id }}', { 
+    customConfig : '', 
+    language : 'en',
+    toolbar :
+    [
+        ['Source','-','Undo','Redo'],
+        ['Find','Replace','-','SelectAll','RemoveFormat'],
+        ['Link', 'Unlink', 'Image'],
+        ['Bold', 'Italic','Underline'],
+        ['NumberedList','BulletedList','-','Blockquote'],
+        ['TextColor', '-', 'SpecialChar', '-', 'Maximize']
+    ],
+    filebrowserBrowseUrl: '/static/js/filemanager/index.html',
+    filebrowserImageBrowseUrl : '/static/js/filemanager/index.html?type=Images',
+});
+</script>{% endif %}
 {% endblock %}

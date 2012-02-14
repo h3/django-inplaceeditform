@@ -14,7 +14,7 @@
 # along with this software.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 def read(*rnames):
@@ -35,7 +35,7 @@ setup(
     license="LGPL 3",
     keywords="django,inplace,inline edit,inline form,inline,inplace edit,inplace form,ajax",
     url='https://tracpub.yaco.es/djangoapps/wiki/InplaceEditForm',
-    packages=('inplaceeditform', 'inplaceeditform.templatetags'),
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
 )

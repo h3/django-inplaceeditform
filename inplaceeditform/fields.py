@@ -11,6 +11,7 @@ from inplaceeditform.commons import  import_module
 from inplaceeditform.commons import has_transmeta, apply_filters
 from inplaceeditform.perms import SuperUserPermEditInline
 
+import re
 
 class BaseAdaptorField(object):
 
@@ -74,6 +75,15 @@ class BaseAdaptorField(object):
         field = self._adding_size(field)
         return field
 
+    def get_editable(self, field):
+        """Get textarea file = editable"""
+        try:
+            field = str(field).replace('\n', '');
+            editable = re.search(r'^<textarea(.*)</textarea>$', field)
+        except:
+            editable = False
+        return editable
+
     def get_value_editor(self, value):
         return self.get_field().field.clean(value)
 
@@ -96,8 +106,10 @@ class BaseAdaptorField(object):
 
     def render_field(self, template_name="inplaceeditform/render_field.html", extra_context=None):
         extra_context = extra_context or {}
+        field = self.get_field()
         context = {'form': self.get_form(),
-                   'field': self.get_field(),
+                   'field': field,
+                   'editable': self.get_editable(field),
                    'MEDIA_URL': settings.MEDIA_URL,
                    'class_inplace': self.class_inplace}
         context.update(extra_context)
@@ -124,6 +136,11 @@ class BaseAdaptorField(object):
             cls_perm = getattr(import_module(path_module), class_adaptor)
         else:
             cls_perm = SuperUserPermEditInline
+        #[IMP] use default django perm
+        if not cls_perm.can_edit(self):
+            model_edit = '%s.change_%s' % (self.model._meta.app_label,self.model._meta.module_name)
+            if self.request.user.has_perm(model_edit):
+                return True
         return cls_perm.can_edit(self)
 
     def loads_to_post(self, request):

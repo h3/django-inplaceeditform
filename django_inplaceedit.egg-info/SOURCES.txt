@@ -1,6 +1,7 @@
 AUTHORS
 CHANGES
 README
+setup.cfg
 setup.py
 video-frame.png
 django_inplaceedit.egg-info/PKG-INFO
