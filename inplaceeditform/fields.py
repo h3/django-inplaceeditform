@@ -119,7 +119,7 @@ class BaseAdaptorField(object):
         extra_context = extra_context or {}
         context = {'field': self.get_field(),
                    'MEDIA_URL': settings.MEDIA_URL,
-                   'ADMIN_MEDIA_PREFIX': settings.ADMIN_MEDIA_PREFIX}
+                   'ADMIN_MEDIA_PREFIX': settings.STATIC_URL}
         context.update(extra_context)
 
         return render_to_string(template_name, context)
