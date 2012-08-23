@@ -1,9 +1,10 @@
-{% load i18n %}{% comment %}
+{% load i18n staticfiles %}
+{% comment %}
 <!-- it needs jquery to work 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js" type="text/javascript"></script>
 -->{% endcomment %}
-<script src="{{ MEDIA_URL }}inplaceeditform/js/jquery.json.js" type="text/javascript"></script>
-<script src="{{ MEDIA_URL }}inplaceeditform/js/jquery.inplaceeditform.js" type="text/javascript"></script>
+<script src="{% static "inplaceeditform/js/jquery.json.js" %}" type="text/javascript"></script>
+<script src="{% static "inplaceeditform/js/jquery.inplaceeditform.js" %}" type="text/javascript"></script>
 
 {% if activate_inplaceedit %}
 <script type="text/javascript"> 
