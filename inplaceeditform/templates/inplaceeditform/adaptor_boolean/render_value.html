@@ -1,5 +1,6 @@
+{% load staticfiles %}
 {% if value %}
-    <img src="{{ MEDIA_URL }}inplaceeditform/img/true.gif" title="{{ value }}" alt="{{ value }}"/>
+    <img src="{% static "inplaceeditform/img/true.gif" %}" title="{{ value }}" alt="{{ value }}"/>
 {% else %}
-    <img src="{{ MEDIA_URL }}inplaceeditform/img/false.gif" title="{{ value }}" alt="{{ value }}"/>
+    <img src="{% static "inplaceeditform/img/false.gif" %}" title="{{ value }}" alt="{{ value }}"/>
 {% endif %}

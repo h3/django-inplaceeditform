@@ -1,4 +1,8 @@
-button.apply,
+
+.inplaceeditform .btn-group {
+    bottom: -8px;
+}
+
 button.applyFile {
   background: transparent none no-repeat scroll 0pt 50%;
   border: medium none;
@@ -9,28 +13,11 @@ button.applyFile {
   background-image:url("../img/apply.gif");
 }
 
-button.apply:hover,
 button.applyFile:hover {
     background: url("../img/apply.gif") no-repeat scroll 0 -50% transparent;
 }
 
-button.cancel {
-  background: transparent none no-repeat scroll 0pt 50%;
-  border: medium none;
-  cursor: pointer;
-  height: 22px;
-  margin: 0pt 0.2em;
-  width: 22px;
-  background-image: url("../img/cancel.gif");
 
-}
-
-button.cancel:hover {
-    background: url("../img/cancel.gif") no-repeat scroll 0 -50% transparent;
-}
-
-button.cancel span,
-button.apply span,
 button.applyFile span {
   visibility: hidden;
 }

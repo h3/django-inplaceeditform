@@ -1,24 +1,22 @@
 {% load i18n %}
 
 {% block form %}
-    <form class="inplaceeditform {{ class_inplace }}" action="{% url inplace_save %}" enctype=multipart/form-data>
-        {{ field }}
+    <form class="inplaceeditform form-inline {{ class_inplace }}" action="{% url inplace_save %}" enctype=multipart/form-data>
         <span class="field_id" style="display:none">{{ field.auto_id }}</span>
+        {{ field }}
         {% block actions %}
+        <div class="btn-group">
             {% block apply %}
-                <button {% if editable %}onclick="CKupdate()"{% endif %} class="apply {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
-                    <span>
-                    {% trans "Save" %}
-                    </span>
+                <button {% if editable %}onclick="CKupdate()"{% endif %} class="apply btn btn-success btn-mini {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
+                    <i class="icon icon-ok icon-white" />
                 </button>
             {% endblock %}
             {% block cancel %}
-                <button class="cancel {% block classcancel %}{% endblock %}" title="{% trans "Cancel change" %}" type="button">
-                    <span>
-                    {% trans "Cancel" %}
-                    </span>
+                <button class="cancel btn btn-danger btn-mini {% block classcancel %}{% endblock %}" title="{% trans "Cancel change" %}" type="button">
+                    <i class="icon icon-remove icon-white" />
                 </button>
             {% endblock %}
+        </div>
         {% endblock %}
     </form>
 

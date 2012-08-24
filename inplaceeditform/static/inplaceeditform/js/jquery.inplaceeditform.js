@@ -100,14 +100,16 @@
             }
 
             function inplaceCancel() {
+                var cancelFinish = $(this).data("cancelFinish"),
+                    form = $(this).parents('.inplaceeditform'),
+                    span = form.prev();
                 revertlinkInplaceEdit($(this).parents("a.linkInplaceEdit"));
-                $(this).parent().prev().fadeIn();
-                $(this).parent().prev().removeClass("inplaceHide");
-                var cancelFinish = $(this).data("cancelFinish");
+                span.fadeIn();
+                span.removeClass("inplaceHide");
                 if (cancelFinish){
                     cancelFinish();
                 }
-                $(this).parent().remove();
+                form.remove();
                 return false;
             }
 

@@ -12,7 +12,6 @@ register = Library()
 def inplace_js(context, activate_inplaceedit=True):
     return context.update({
             'MEDIA_URL': context.get('MEDIA_URL', settings.MEDIA_URL),
-            'ADMIN_MEDIA_PREFIX': settings.STATIC_URL,
             'activate_inplaceedit': activate_inplaceedit,
     })
 register.inclusion_tag("inplaceeditform/inplace_js.html", takes_context=True)(inplace_js)
@@ -21,7 +20,6 @@ register.inclusion_tag("inplaceeditform/inplace_js.html", takes_context=True)(in
 def inplace_css(context):
     return context.update({
             'MEDIA_URL': context.get('MEDIA_URL', settings.MEDIA_URL),
-            'ADMIN_MEDIA_PREFIX': settings.STATIC_URL,
     })
 register.inclusion_tag("inplaceeditform/inplace_css.html", takes_context=True)(inplace_css)
 
@@ -29,7 +27,6 @@ register.inclusion_tag("inplaceeditform/inplace_css.html", takes_context=True)(i
 def inplace_media(context):
     return context.update({
             'MEDIA_URL': context.get('MEDIA_URL', settings.MEDIA_URL),
-            'ADMIN_MEDIA_PREFIX': settings.STATIC_URL,
     })
 register.inclusion_tag("inplaceeditform/inplace_media.html", takes_context=True)(inplace_media)
 
