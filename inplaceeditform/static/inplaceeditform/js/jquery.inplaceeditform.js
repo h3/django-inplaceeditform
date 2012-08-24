@@ -33,60 +33,67 @@
                 data += "&__widget_height=" + $(this).innerHeight() + "px" + "&__widget_width=" + $(this).innerWidth() + "px";
                 var _this = $(this);
                 $.ajax({
-                data: data,
-                url: opts.getFieldUrl,
-                type: "GET",
-                async:true,
-                dataType: 'json',
-                success: function(response) {
-                    if (response == null) {
-                        alert("The server is down");
-                    }
-                    else if (response.errors) {
-                        alert(response.errors);
-                    }
-                    else {
-                        _this.hide();
-                        _this.addClass("inplaceHide");
-                        var tags = $(response.field_render);
-                        $(response.field_render).insertAfter(_this);
+                    data: data,
+                    url: opts.getFieldUrl,
+                    type: "GET",
+                    async:true,
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response == null) {
+                            alert("The server is down");
+                        }
+                        else if (response.errors) {
+                            alert(response.errors);
+                        }
+                        else {
+                            _this.hide();
+                            _this.addClass("inplaceHide");
+                            var tags = $(response.field_render);
+                            $(response.field_render).insertAfter(_this);
 
-                        var head = $("head")[0];
-                        try {
-                            var medias = $(response.field_media_render);
-                            $.map(medias, function(media){
-                               loadjscssfile(media);
-                            });
-                        }catch(err){
-                        }
-                        var links_parents = _this.next().parents("a");
-                        if(links_parents.length > 0) {
-                            $.map(links_parents, function (link, i) {
-                                var link = $(link);
-                                var href = link.attr("href");
-                                link.attr("hrefinplaceedit", href);
-                                link.addClass("linkInplaceEdit");
-                                link.removeAttr("href");
-                            });
-                        }
-                        var applyButton = _this.next().find(".apply");
-                        var cancelButton = _this.next().find(".cancel");
-                        var applyFileButton = _this.next().find(".applyFile");
-                        if (cancelButton) {
-                            cancelButton.click(inplaceCancel);
-                        }
-                        if (applyButton) {
-                            applyButton.click(inplaceApply);
-                            _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyButton));
-                        }
-                        if (applyFileButton) {
-                            applyFileButton.click(inplaceApplyUpload);
-                            _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyFileButton));
-                        }
+                            var head = $("head")[0];
+                            try {
+                                var medias = $(response.field_media_render);
+                                $.map(medias, function(media){
+                                   loadjscssfile(media);
+                                });
+                            }catch(err){
+                            }
+                            var links_parents = _this.next().parents("a");
+                            if(links_parents.length > 0) {
+                                $.map(links_parents, function (link, i) {
+                                    var link = $(link);
+                                    var href = link.attr("href");
+                                    link.attr("hrefinplaceedit", href);
+                                    link.addClass("linkInplaceEdit");
+                                    link.removeAttr("href");
+                                });
+                            }
+                            var applyButton = _this.next().find(".apply");
+                            var cancelButton = _this.next().find(".cancel");
+                            var applyFileButton = _this.next().find(".applyFile");
+                            //var initializeField = _this.data("initializeField"); // A hook
+                            //console.log(_this);
+                            //if (initializeField) {
+                            //    console.log('AAA', initializeField)
+                            //}
+
+                            if (cancelButton) {
+                                cancelButton.click(inplaceCancel);
+                            }
+                            if (applyButton) {
+                                applyButton.click(inplaceApply);
+                                _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyButton));
+                            }
+                            if (applyFileButton) {
+                                applyFileButton.click(inplaceApplyUpload);
+                                _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyFileButton));
+                            }
 
 
+                        }
                     }
-                }});
+                });
             });
 
             function revertlinkInplaceEdit(links_parents) {
@@ -141,7 +148,7 @@
                     form.prepend("<ul class='errors'><li>" + response.errors + "</li></ul>");
                 }
                 else {
-                    _this.parent().fadeOut();
+                    _this.parents('.inplaceeditform').fadeOut();
                     _this.fadeIn();
                     form.removeClass("inplaceeditformsaving");
                     var inplace_span = inplaceedit_conf.parents(".inplaceedit");
@@ -160,7 +167,7 @@
                     if (applyFinish){
                         applyFinish(_this);
                     }
-                    _this.parent().remove();
+                    _this.parents('.inplaceeditform').remove();
                 }
             }
 

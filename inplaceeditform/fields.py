@@ -117,9 +117,7 @@ class BaseAdaptorField(object):
 
     def render_media_field(self, template_name="inplaceeditform/render_media_field.html", extra_context=None):
         extra_context = extra_context or {}
-        context = {'field': self.get_field(),
-                   'MEDIA_URL': settings.MEDIA_URL,
-                   'ADMIN_MEDIA_PREFIX': settings.STATIC_URL}
+        context = {'field': self.get_field()}
         context.update(extra_context)
 
         return render_to_string(template_name, context)
@@ -290,10 +288,10 @@ class AdaptorDateTimeField(BaseDateField):
     def render_media_field(self, template_name="inplaceeditform/adaptor_datetime/render_media_field.html"):
         return super(AdaptorDateTimeField, self).render_media_field(template_name)
 
-    def get_field(self):
-        field = super(AdaptorDateTimeField, self).get_field()
-        field.field.widget = AdminSplitDateTime()
-        return field
+   #def get_field(self):
+   #    field = super(AdaptorDateTimeField, self).get_field()
+   #    field.field.widget = AdminSplitDateTime()
+   #    return field
 
     def render_value(self, field_name=None):
         val = super(AdaptorDateTimeField, self).render_value(field_name)
