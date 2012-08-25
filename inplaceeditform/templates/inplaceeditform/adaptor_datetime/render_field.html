@@ -2,3 +2,10 @@
 
 {% block classapply %}{{ block.super }} applyDatetime{% endblock %}
 
+{% block widget.type %}datetime{% endblock %}
+
+{% block widget.options %}
+ data-opt-separator=" @ "
+ data-opt-hour-grid="3"
+ data-opt-minute-grid="10"
+{% endblock %}

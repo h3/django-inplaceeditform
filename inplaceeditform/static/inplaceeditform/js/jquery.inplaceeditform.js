@@ -1,22 +1,21 @@
 (function($) {
     $.fn.inplaceeditform = function (opts, callback) {
-        var defaults = {"getFieldUrl": "/inplaceeditform/get_field/",
+        var enabled = true,
+            defaults = {
+            "getFieldUrl": "/inplaceeditform/get_field/",
             "saveURL": "/inplaceeditform/save/",
             "successText": "Successfully saved"};
-        var enabled = true;
+        
         opts = $.extend(defaults, opts || {});
+
         this.each(function () {
             $(this).click(function() {
-                if(!enabled) {
-                    return true;
-                }
-                return false;
+                if(!enabled) return true;
+                else return false;
             });
 
             $(this).bind("mouseenter", function() {
-                if(!enabled) {
-                    return false;
-                }
+                if(!enabled) return false;
                 $(this).addClass("edit_over");
             });
 
@@ -30,6 +29,7 @@
                 }
                 $(this).data("inplace_enabled")
                 var data = getDataToRequest($(this).find("span.config"));
+                var field_id = $(this).parents('.inplaceeditform').data('field-id')
                 data += "&__widget_height=" + $(this).innerHeight() + "px" + "&__widget_width=" + $(this).innerWidth() + "px";
                 var _this = $(this);
                 $.ajax({
@@ -90,6 +90,9 @@
                                 _this.next("form.inplaceeditform").submit(bind(inplaceApply, applyFileButton));
                             }
 
+                            if ($.isFunction($.widgets.load)) {
+                                $.widgets.load()
+                            }
 
                         }
                     }
