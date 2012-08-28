@@ -1,0 +1,10 @@
+{% extends  "inplaceeditform/render_field.html" %}
+
+{% block classapply %}{{ block.super }} applySlider{% endblock %}
+{% block cancelapply %}{{ block.super }} applySlider{% endblock %}
+
+{% block widget.type %}slider{% endblock %}
+
+{% block widget.options %}
+ data-opt-step="5"
+{% endblock %}

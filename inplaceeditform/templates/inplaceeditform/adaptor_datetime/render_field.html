@@ -5,7 +5,12 @@
 {% block widget.type %}datetime{% endblock %}
 
 {% block widget.options %}
- data-opt-separator=" @ "
+ data-date-format="dd/mm/yy"
+ data-opt-separator=" "
+ data-opt-time-format="hh:mm:ss"
  data-opt-hour-grid="3"
- data-opt-minute-grid="10"
+ data-opt-minute-grid="15"
+ data-opt-second-grid="30"
+ data-opt-show-second="true"
+ data-opt-regional="fr"
 {% endblock %}

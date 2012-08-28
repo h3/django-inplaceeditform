@@ -1,6 +1,5 @@
-{% load staticfiles %}
 {% if value %}
-    <img src="{% static "inplaceeditform/img/true.gif" %}" title="{{ value }}" alt="{{ value }}"/>
+<a class="btn btn-primary"><i class="icon icon-white icon-ok-sign"></i><span> Oui</span></a>
 {% else %}
-    <img src="{% static "inplaceeditform/img/false.gif" %}" title="{{ value }}" alt="{{ value }}"/>
+<a class="btn"><i class="icon icon-ban-circle"></i><span> Non</span></a>
 {% endif %}

@@ -167,14 +167,15 @@ class BaseAdaptorField(object):
         auto_width = self.get_auto_width()
         if not 'style' in attrs:
             style = ''
-            height = int(widget_options.get('height', '0').replace('px', ''))
-            width = int(widget_options.get('width', '0').replace('px', ''))
-            if height and not auto_height:
-                style += "height: %s; " % self.treatment_height(height, width)
-            if width and not auto_width:
-                style += "width: %s; " % self.treatment_width(width, height)
-            if not auto_height or not auto_width:
-                style += "font-size: %spx; " % self.font_size
+           # TODO: Need to clean this mess.. or maybe I'm missing the motivation.
+           #height = int(widget_options.get('height', '0').replace('px', ''))
+           #width = int(widget_options.get('width', '0').replace('px', ''))
+           #if height and not auto_height:
+           #    style += "height: %s; " % self.treatment_height(height, width)
+           #if width and not auto_width:
+           #    style += "width: %s; " % self.treatment_width(width, height)
+           #if not auto_height or not auto_width:
+           #    style += "font-size: %spx; " % self.font_size
             for key, value in widget_options.items():
                 if key in ('height', 'width'):
                     continue

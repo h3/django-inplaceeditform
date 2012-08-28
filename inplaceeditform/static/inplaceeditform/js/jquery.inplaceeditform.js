@@ -72,11 +72,6 @@
                             var applyButton = _this.next().find(".apply");
                             var cancelButton = _this.next().find(".cancel");
                             var applyFileButton = _this.next().find(".applyFile");
-                            //var initializeField = _this.data("initializeField"); // A hook
-                            //console.log(_this);
-                            //if (initializeField) {
-                            //    console.log('AAA', initializeField)
-                            //}
 
                             if (cancelButton) {
                                 cancelButton.click(inplaceCancel);
@@ -148,7 +143,7 @@
                 }
                 else if (response.errors) {
                     form.animate({opacity: 1});
-                    form.prepend("<ul class='errors'><li>" + response.errors + "</li></ul>");
+                    form.append("<ul class='alert alert-error'><li>" + response.errors + "</li></ul>");
                 }
                 else {
                     _this.parents('.inplaceeditform').fadeOut();
@@ -157,8 +152,8 @@
                     var inplace_span = inplaceedit_conf.parents(".inplaceedit");
                     var config = inplace_span.find("span.config").html();
                     inplace_span.html(response.value + "<span class='config' style='display:none;'>" + config + "</span>");
-                    var success_message = $("<ul class='success'><li>" + opts.successText + "</li></ul>")
-                    inplace_span.prepend(success_message);
+                    var success_message = $('<ul class="alert alert-success"><li>' + opts.successText + '</li></ul>');
+                    inplace_span.append(success_message);
                     setTimeout(function(){
                         success_message.fadeOut(function(){
                             $(this).remove();

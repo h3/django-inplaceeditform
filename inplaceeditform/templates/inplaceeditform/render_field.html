@@ -10,12 +10,12 @@
     {% block actions %}
     <div class="btn-group">
         {% block apply %}
-            <button {% if editable %}onclick="CKupdate()"{% endif %} class="apply btn btn-success btn-mini {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
+            <button {% if editable %}onclick="CKupdate()"{% endif %} class="apply btn btn-success btn-small {% block classapply %}{% endblock %}" title="{% trans "Apply change" %}" type="button">
                 <i class="icon icon-ok icon-white" />
             </button>
         {% endblock %}
         {% block cancel %}
-            <button class="cancel btn btn-danger btn-mini {% block classcancel %}{% endblock %}" title="{% trans "Cancel change" %}" type="button">
+            <button class="cancel btn btn-danger btn-small {% block classcancel %}{% endblock %}" title="{% trans "Cancel change" %}" type="button">
                 <i class="icon icon-remove icon-white" />
             </button>
         {% endblock %}
