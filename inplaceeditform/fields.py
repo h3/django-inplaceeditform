@@ -109,6 +109,7 @@ class BaseAdaptorField(object):
         field = self.get_field()
         context = {'form': self.get_form(),
                    'field': field,
+                   'config': self.config,
                    'editable': self.get_editable(field),
                    'MEDIA_URL': settings.MEDIA_URL,
                    'class_inplace': self.class_inplace}

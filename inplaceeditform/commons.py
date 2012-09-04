@@ -1,11 +1,18 @@
 # -*- coding: utf-8 -*-
 from django import template
+from django.conf import settings as django_settings
 from django.db import models
 from django.db.models.fields import FieldDoesNotExist
 from django.db.models.fields.related import ForeignKey, ManyToManyField
-from django.conf import settings
 
-from inplaceeditform.adaptors import ADAPTOR_INPLACEEDIT as DEFAULT_ADAPTOR_INPLACEEDIT
+from inplaceeditform.conf import settings
+
+ADAPTOR_INPLACEEDIT = settings.DEFAULT_ADAPTOR_INPLACEEDIT
+
+if hasattr(django_settings, 'ADAPTOR_INPLACEEDIT'):
+    settings.DEFAULT_ADAPTOR_INPLACEEDIT\
+        .update(django_settings.ADAPTOR_INPLACEEDIT)
+
 
 has_transmeta = False
 DEFAULT_VALUE = ''
@@ -81,13 +88,13 @@ def get_adaptor_class(adaptor=None, obj=None, field_name=None):
             adaptor = 'image'
         elif isinstance(field, models.FileField):
             adaptor = 'file'
-    from inplaceeditform.fields import BaseAdaptorField
-    path_adaptor = adaptor and ((getattr(settings, 'ADAPTOR_INPLACEEDIT', None) and
-                                 settings.ADAPTOR_INPLACEEDIT.get(adaptor, None)) or
-                                 (DEFAULT_ADAPTOR_INPLACEEDIT.get(adaptor, None)))
+    
+    path_adaptor = ADAPTOR_INPLACEEDIT.get(adaptor, None)
+
     if not path_adaptor and adaptor:
         return get_adaptor_class(obj=obj, field_name=field_name)
     elif not path_adaptor:
+        from inplaceeditform.fields import BaseAdaptorField # Why ?
         return BaseAdaptorField
     path_module, class_adaptor = ('.'.join(path_adaptor.split('.')[:-1]), path_adaptor.split('.')[-1])
     return getattr(import_module(path_module), class_adaptor)
