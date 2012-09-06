@@ -49,15 +49,15 @@ class InplaceEditNode(RenderWithArgsAndKwargsNode):
         class_adaptor = get_adaptor_class(adaptor, obj, field_name)
         request = context.get('request')
 
-        print 'expression_to_show: %s' % expression_to_show
-        print 'tokens_to_show: %s' % tokens_to_show
-        print 'obj_field_name: %s' % obj_field_name
-        print 'obj_field_name_split: %s' % obj_field_name_split
-        print 'obj_context: %s' % obj_context
-        print 'field_name: %s' % field_name
-        print 'obj: %s' % obj
-        print 'adaptor: %s' % adaptor
-        print 'class_adaptor: %s' % class_adaptor
+       #print 'expression_to_show: %s' % expression_to_show
+       #print 'tokens_to_show: %s' % tokens_to_show
+       #print 'obj_field_name: %s' % obj_field_name
+       #print 'obj_field_name_split: %s' % obj_field_name_split
+       #print 'obj_context: %s' % obj_context
+       #print 'field_name: %s' % field_name
+       #print 'obj: %s' % obj
+       #print 'adaptor: %s' % adaptor
+       #print 'class_adaptor: %s' % class_adaptor
 
         config = class_adaptor.get_config(**kwargs)
         adaptor_field = class_adaptor(request, obj, field_name,
