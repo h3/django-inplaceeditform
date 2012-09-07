@@ -146,6 +146,7 @@ class BaseAdaptorField(object):
         return simplejson.loads(request.POST.get('value'))
 
     def save(self, value):
+        #print self.field_name
         setattr(self.obj, self.field_name, value)
         self.obj.save()
 
